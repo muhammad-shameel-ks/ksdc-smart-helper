@@ -9,6 +9,27 @@ const port = process.env.PORT || 3001;
 // --- Security Enhancements ---
 
 // 1. API Key Authentication Middleware
+const API_KEY = process.env.API_KEY; // Should be in .env
+
+if (!API_KEY) {
+  console.warn(
+    "⚠️ WARNING: API_KEY is not set. Using a default, insecure key. Please set a secure API_KEY in your .env file for production."
+  );
+}
+const SECURE_API_KEY = API_KEY || "default-insecure-api-key-change-me";
+
+const apiKeyAuth = (req: Request, res: Response, next: Function) => {
+  const providedApiKey = req.headers["x-api-key"];
+  if (req.path === "/api/test") {
+    return next();
+  }
+  if (!providedApiKey || providedApiKey !== SECURE_API_KEY) {
+    return res
+      .status(401)
+      .json({ error: "Unauthorized: Invalid or missing API Key" });
+  }
+  next();
+};
 
 // 2. Whitelist for database switching
 const ALLOWED_DATABASES =
@@ -22,8 +43,27 @@ if (ALLOWED_DATABASES.length === 0) {
 }
 
 // Middleware
-app.use(cors());
+const whitelist = [
+  "http://localhost:5173",
+  "http://localhost:5174", // Added for current dev environment
+  "https://ksdc-tool.vercel.app",
+];
+
+const corsOptions: CorsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || whitelist.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+  optionsSuccessStatus: 200, // For legacy browser support
+};
+
+app.use(cors(corsOptions));
 app.use(express.json()); // Middleware to parse JSON bodies
+app.use(apiKeyAuth); // Apply API key authentication to all routes
 
 // Test route to verify server is running
 app.get("/api/test", async (req: Request, res: Response) => {
@@ -473,4 +513,3 @@ app.get("/api/scheme/:loanNo", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-

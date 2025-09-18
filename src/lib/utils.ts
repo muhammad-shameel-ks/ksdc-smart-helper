@@ -30,9 +30,12 @@ export async function apiFetch(
   url: string,
   options: RequestInit = {}
 ): Promise<Response> {
+  const apiKey = import.meta.env.VITE_API_KEY as string;
+
   const headers = {
     ...options.headers,
     "Content-Type": "application/json",
+    "x-api-key": apiKey,
   };
 
   const baseURL = "http://localhost:3001";
@@ -40,6 +43,7 @@ export async function apiFetch(
   const fullURL = `${baseURL}${url}`;
 
   console.log(`[apiFetch] Requesting URL: ${fullURL}`);
+  console.log(`[apiFetch] Using API Key: ${apiKey}`);
 
   const fetchOptions: RequestInit = {
     ...options,
