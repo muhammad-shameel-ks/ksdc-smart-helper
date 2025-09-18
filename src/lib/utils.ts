@@ -30,27 +30,16 @@ export async function apiFetch(
   url: string,
   options: RequestInit = {}
 ): Promise<Response> {
-  const apiKey =
-    (import.meta.env.VITE_API_KEY as string) ||
-    (process.env.VITE_API_KEY as string) ||
-    ""; // Ensure VITE_API_KEY is properly set in the environment
-
   const headers = {
     ...options.headers,
     "Content-Type": "application/json",
-    "x-api-key": apiKey,
   };
 
-  const isProduction = import.meta.env.VITE_NODE_ENV === "production";
-  const baseURL = isProduction
-    ? "https://ksdc-tools-backend.vercel.app"
-    : "http://localhost:3001";
+  const baseURL = "http://localhost:3001";
 
   const fullURL = `${baseURL}${url}`;
 
   console.log(`[apiFetch] Requesting URL: ${fullURL}`);
-  console.log(`[apiFetch] Production Mode: ${isProduction}`);
-  console.log(`[apiFetch] Using API Key: ${apiKey}`);
 
   const fetchOptions: RequestInit = {
     ...options,

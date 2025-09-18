@@ -9,27 +9,6 @@ const port = process.env.PORT || 3001;
 // --- Security Enhancements ---
 
 // 1. API Key Authentication Middleware
-const API_KEY = process.env.API_KEY; // Should be in .env
-
-if (!API_KEY) {
-  console.warn(
-    "⚠️ WARNING: API_KEY is not set. Using a default, insecure key. Please set a secure API_KEY in your .env file for production."
-  );
-}
-const SECURE_API_KEY = API_KEY || "default-insecure-api-key-change-me";
-
-const apiKeyAuth = (req: Request, res: Response, next: Function) => {
-  const providedApiKey = req.headers["x-api-key"];
-  if (req.path === "/api/test") {
-    return next();
-  }
-  if (!providedApiKey || providedApiKey !== SECURE_API_KEY) {
-    return res
-      .status(401)
-      .json({ error: "Unauthorized: Invalid or missing API Key" });
-  }
-  next();
-};
 
 // 2. Whitelist for database switching
 const ALLOWED_DATABASES =
@@ -43,26 +22,8 @@ if (ALLOWED_DATABASES.length === 0) {
 }
 
 // Middleware
-const whitelist = [
-  "http://localhost:5173",
-  "https://ksdc-tool.vercel.app",
-];
-
-const corsOptions: CorsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || whitelist.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-  optionsSuccessStatus: 200, // For legacy browser support
-};
-
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json()); // Middleware to parse JSON bodies
-app.use(apiKeyAuth); // Apply API key authentication to all routes
 
 // Test route to verify server is running
 app.get("/api/test", async (req: Request, res: Response) => {
@@ -102,10 +63,7 @@ app.post("/api/switch-db", async (req: Request, res: Response) => {
     res.json({ message: `Successfully switched to database: ${dbName}` });
   } catch (err: any) {
     console.error("Failed to switch database", err);
-    const errorMessage =
-      process.env.NODE_ENV === "production"
-        ? "An unexpected error occurred while switching databases."
-        : err.message;
+    const errorMessage = err.message;
     res
       .status(500)
       .json({ error: "Failed to switch database", message: errorMessage });
@@ -122,10 +80,7 @@ app.get("/api/current-db", async (req: Request, res: Response) => {
     res.json({ dbName: result.recordset[0].db_name });
   } catch (err) {
     console.error("Failed to get current db", err);
-    const errorMessage =
-      process.env.NODE_ENV === "production"
-        ? "An unexpected error occurred while fetching the current database."
-        : (err as Error).message;
+    const errorMessage = (err as Error).message;
     res
       .status(500)
       .json({ error: "Failed to get current database", message: errorMessage });
@@ -161,10 +116,7 @@ app.get(
       res.json(result.recordset);
     } catch (err) {
       console.error(err);
-      const errorMessage =
-        process.env.NODE_ENV === "production"
-          ? "An unexpected error occurred."
-          : (err as Error).message;
+      const errorMessage = (err as Error).message;
       res
         .status(500)
         .json({ error: "Internal Server Error", message: errorMessage });
@@ -213,10 +165,7 @@ app.get("/api/loan-details", async (req: Request, res: Response) => {
     res.json(result.recordset[0]);
   } catch (err: any) {
     console.error(err);
-    const errorMessage =
-      process.env.NODE_ENV === "production"
-        ? "An unexpected error occurred."
-        : err.message;
+    const errorMessage = err.message;
     res
       .status(500)
       .json({ error: "Internal Server Error", message: errorMessage });
@@ -367,10 +316,7 @@ app.post("/api/check-receipt", async (req: Request, res: Response) => {
     });
   } catch (err: any) {
     console.error(err);
-    const errorMessage =
-      process.env.NODE_ENV === "production"
-        ? "An unexpected error occurred."
-        : err.message;
+    const errorMessage = err.message;
     res
       .status(500)
       .json({ error: "Internal Server Error", message: errorMessage });
@@ -452,10 +398,7 @@ app.post("/api/check-receipt-step", async (req: Request, res: Response) => {
     res.json({ status, result: result.recordset, message, overallStatus });
   } catch (err: any) {
     console.error(err);
-    const errorMessage =
-      process.env.NODE_ENV === "production"
-        ? "An unexpected error occurred."
-        : err.message;
+    const errorMessage = err.message;
     res
       .status(500)
       .json({ status: "error", result: [], message: errorMessage });
@@ -486,10 +429,7 @@ app.get("/api/bank-details/:loanAppId", async (req: Request, res: Response) => {
     }
   } catch (err) {
     console.error(err);
-    const errorMessage =
-      process.env.NODE_ENV === "production"
-        ? "An unexpected error occurred."
-        : (err as Error).message;
+    const errorMessage = (err as Error).message;
     res
       .status(500)
       .json({ error: "Internal Server Error", message: errorMessage });
