@@ -42,8 +42,6 @@ export async function apiFetch(
 
   const fullURL = `${baseURL}${url}`;
 
-  console.log(`[apiFetch] Requesting URL: ${fullURL}`);
-  console.log(`[apiFetch] Using API Key: ${apiKey}`);
 
   const fetchOptions: RequestInit = {
     ...options,

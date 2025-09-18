@@ -86,7 +86,13 @@ const DbStatus = () => {
       setCurrentDb(data.dbName);
       setSelectedDb(data.dbName);
     } catch (e: any) {
-      setError(e.message);
+      if (e.message === "Failed to fetch") {
+        setError(
+          "Failed to fetch. This might be due to an adblocker or network issue. Please disable your adblocker or check your internet connection."
+        );
+      } else {
+        setError(e.message);
+      }
     } finally {
       setLoading(false);
     }
