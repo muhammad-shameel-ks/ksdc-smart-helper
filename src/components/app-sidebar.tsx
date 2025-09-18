@@ -15,6 +15,7 @@ import {
 import { apiFetch } from "@/lib/utils";
 
 import { NavMain } from "@/components/nav-main";
+import { UserButton } from "@clerk/clerk-react";
 import {
   Sidebar,
   SidebarContent,
@@ -196,6 +197,7 @@ export function AppSidebar({
       </SidebarContent>
       <SidebarFooter>
         <DbStatus />
+        <UserButton afterSignOutUrl="/" />
       </SidebarFooter>
     </Sidebar>
   );
