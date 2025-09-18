@@ -2,12 +2,7 @@ import { useState } from "react";
 import { apiFetch } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  SignedOut,
-  SignInButton,
-  Waitlist,
-  SignedIn,
-} from "@clerk/clerk-react";
+import { SignedOut, SignInButton, SignedIn } from "@clerk/clerk-react";
 import { Label } from "@/components/ui/label";
 import {
   Popover,
