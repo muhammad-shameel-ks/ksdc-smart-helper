@@ -19,7 +19,7 @@ import {
   Legend,
   Tooltip,
 } from "recharts";
-import { ClipboardCopy } from "lucide-react";
+import { ClipboardCopy, ArrowRight } from "lucide-react";
 
 interface EMIResult {
   monthlyEMI: number;
@@ -48,8 +48,14 @@ function EMICalculator() {
   const [loanAmount, setLoanAmount] = useState<string>("");
   const [interestRate, setInterestRate] = useState<string>("");
   const [result, setResult] = useState<EMIResult | null>(null);
+  const [roundedEmi, setRoundedEmi] = useState<number | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [calculationMode, setCalculationMode] = useState<'emi' | 'interest_only' | null>(null);
+
+  // Helper function to round to the nearest 50
+  const roundToNearest50 = (value: number): number => {
+    return Math.round(value / 50) * 50;
+  };
 
   // Smart date parser function
   const parseSmartDate = (dateText: string): Date | null => {
@@ -277,6 +283,7 @@ function EMICalculator() {
       tenureMonths: tenureMonths,
       tenureYears: calculatedTenureYears,
     });
+    setRoundedEmi(roundToNearest50(calculatedMonthlyEMI));
   };
 
   const resetForm = () => {
@@ -286,6 +293,7 @@ function EMICalculator() {
     setLoanAmount("");
     setInterestRate("");
     setResult(null);
+    setRoundedEmi(null);
     setErrors({});
   };
 
@@ -321,6 +329,7 @@ function EMICalculator() {
       // If not ready for calculation, clear the result if it's currently displayed
       if (result !== null) {
         setResult(null);
+        setRoundedEmi(null);
       }
     }
   }, [fromDateText, toDateText, loanDurationMonths, loanAmount, interestRate]);
@@ -599,9 +608,15 @@ function EMICalculator() {
                       <span className="text-gray-600 font-medium">
                         Monthly EMI
                       </span>
-                      <span className="text-xl font-bold">
-                        ₹{Math.round(result.monthlyEMI).toLocaleString("en-IN")}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-base text-gray-500 line-through">
+                          ₹{Math.round(result.monthlyEMI).toLocaleString("en-IN")}
+                        </span>
+                        <ArrowRight className="h-4 w-4 text-gray-400" />
+                        <span className="text-xl font-bold">
+                          ₹{roundedEmi?.toLocaleString("en-IN")}
+                        </span>
+                      </div>
                     </div>
                     <div className="flex justify-between items-center py-2">
                       <span className="text-gray-600 font-medium">
