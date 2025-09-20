@@ -7,8 +7,9 @@ import {
   IconInnerShadowTop,
   IconSearch,
 } from "@tabler/icons-react";
+import { UserButton } from "@clerk/clerk-react";
 import {
-  Popover,  
+  Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
@@ -196,6 +197,7 @@ export function AppSidebar({
       </SidebarContent>
       <SidebarFooter>
         <DbStatus />
+        <UserButton afterSignOutUrl="/" />
       </SidebarFooter>
     </Sidebar>
   );

@@ -10,9 +10,19 @@ import { AppSidebar } from "./components/app-sidebar";
 import { SiteHeader } from "./components/site-header";
 import { SidebarProvider, SidebarInset } from "./components/ui/sidebar";
 import { LoanAppIdFinder } from "./components/LoanAppIdFinder";
+import SignInPage from "./components/SignInPage";
+import SignUpPage from "./components/SignUpPage";
+import { useUser } from "@clerk/clerk-react";
 
 function App() {
+  const { isLoaded, isSignedIn } = useUser();
   const [page, setPage] = useState("business-calculators");
+  const [authPage, setAuthPage] = useState<"signIn" | "signUp">(() => {
+    if (window.location.pathname === "/sign-up") {
+      return "signUp";
+    }
+    return "signIn";
+  });
 
   const renderPage = () => {
     if (page === "business-calculators") {
@@ -32,6 +42,18 @@ function App() {
     }
     return <BusinessCalculators />;
   };
+
+  if (!isLoaded) {
+    return <div>Loading...</div>;
+  }
+
+  if (!isSignedIn) {
+    if (authPage === "signIn") {
+      return <SignInPage setAuthPage={setAuthPage} />;
+    } else {
+      return <SignUpPage setAuthPage={setAuthPage} />;
+    }
+  }
 
   return (
     <SidebarProvider>
