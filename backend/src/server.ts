@@ -47,6 +47,7 @@ const whitelist = [
   "http://localhost:5173",
   "http://localhost:5174", // Added for current dev environment
   "https://ksdc-smart-helper.vercel.app",
+  "https://ksdc-smart-helper-git-auth-v2-mallubeast69s-projects.vercel.app",
 ];
 
 const corsOptions: CorsOptions = {
